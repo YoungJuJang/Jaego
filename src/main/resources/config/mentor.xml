@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mentorDao">
+
+	<select id="list" resultType="mentorDto">
+		SELECT * FROM MENTOR ORDER BY mentor_id
+	</select>
+	
+	<insert id="insertMentor" parameterType="mentorDto">
+		INSERT INTO MENTOR( MEMBER_ID,MENTOR_CONTENT, MENTOR_IMG, MENTOR_CAREER1, MENTOR_CAREER2,
+		MENTOR_CAREER3, MENTOR_CAREER4, MENTOR_CAREER5, MENTOR_LINK1, MENTOR_LINK2, MENTOR_LINK3, MENTOR_ACCOUNT, MENTOR_BANK)
+		VALUES ( #{memberId},#{mentorContent}, #{mentorImg}, #{mentorCareer1}, #{mentorCareer2}, #{mentorCareer3}, #{mentorCareer4}, #{mentorCareer5},
+		#{mentorLink1}, #{mentorLink2}, #{mentorLink3}, #{mentorAccount}, #{mentorBank})
+	</insert>
+	
+	<select resultType="mentorDto" id="selectByMemberId" parameterType="int">
+		SELECT * FROM MENTOR WHERE member_id = #{memberId}
+	</select>
+	
+	<select resultType="mentorDto" id="selectByMentorId" parameterType="int">
+		SELECT * FROM MENTOR WHERE mentor_id = #{mentorId}
+	</select>
+	
+	<update id="update" parameterType="mentorDto">
+		UPDATE MENTOR SET MENTOR_IMG = #{mentorImg}
+		MENTOR_CONTENT=#{mentorContent}
+		MENTOR_CAREER1=#{mentorCareer1}
+		MENTOR_CAREER2=#{mentorCareer2}
+		MENTOR_CAREER3=#{mentorCareer3}
+		MENTOR_CAREER4=#{mentorCareer4}
+		MENTOR_CAREER5=#{mentorCareer5}
+		MENTOR_LINK1=#{mentorLink1}
+		MENTOR_LINK2=#{mentorLink2}
+		MENTOR_LINK3=#{mentorLink3)
+		MENTOR_ACCOUNT=#{mentorAccount}
+		MENTOR_BANK=#{mentorBank}
+		WHERE MENTOR_ID = #{mentorId}
+	</update>
+	
+	<delete id="delete" parameterType="mentorDto">
+		DELETE FROM MENTOR WHERE MENTOR_ID = #{mentorId}
+	</delete>
+	
+</mapper>

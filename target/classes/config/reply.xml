@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+<!-- 다른 mapper와 중복되지 않도록 네임스페이스 기재 -->
+<mapper namespace="reply">
+    
+    <!-- 댓글 입력 -->
+    <insert id="insertReply" parameterType="com.jaego.web.dto.ReplyDto">
+    	INSERT INTO REPLY(lectureroom_id, replyer, reply_content)
+        VALUES (#{lectureroomId}, #{replyer}, #{replyContent});
+    </insert>
+    
+    <!-- 댓글 목록 -->
+    <select id="listReply" parameterType="int" resultType="com.jaego.web.dto.ReplyDto">
+          select * from reply where lectureroom_id=#{lectureroomId};     
+    </select>
+    
+    <select id="replyTotalCount" parameterType="int" resultType="int">
+        select count(lectureroom_id) FROM reply WHERE  lectureroom_id=#{lectureroomId} 
+    </select>
+    
+    <delete id="deleteReply" parameterType="int">
+    	delete from reply where reply_id=#{replyId}
+    </delete>
+    
+</mapper>

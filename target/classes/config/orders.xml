@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="orderDao">
+
+
+	<insert id="insertOrder" parameterType="orderDto">
+		insert into orders values(#{ordersId},#{lectureId},#{memberId});
+	</insert>
+	
+	<select id="orderMember" parameterType= "int" resultType="memberDto">
+		select member_age,member_gender from member where member_id = ANY(select member_id from orders where lecture_id = #{lectureId});
+	</select>
+	
+
+	
+
+</mapper>

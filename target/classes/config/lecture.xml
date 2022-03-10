@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="lectureDao">
+
+	<select id="selectAll" parameterType="java.util.Map" resultType="lectureDto">
+		SELECT @ROWNUM:=@ROWNUM+1 as ROWNUM, L.* from LECTURE L,(select @ROWNUM := 0) TMP ORDER BY lecture_id DESC LIMIT ${start},${pageSize};
+	</select>
+	
+	<select id="lectureCount" resultType="int">
+		SELECT  count(*) from LECTURE L, lecture_imgFile LI where(L.lecture_id=LI.lecture_id);
+	</select>
+	
+	<select id="view" parameterType="int" resultType="lectureDto">
+		SELECT * from LECTURE where lecture_id=#{lectureId};
+	</select>
+	
+
+	<insert id="insertLecture" parameterType="java.util.Map" useGeneratedKeys="true" keyProperty="lectureId" keyColumn="lecture_id"> 
+		INSERT INTO LECTURE(mentor_id,member_id,lecture_title,lecture_content,lecture_price,lecture_start,lecture_end,
+		lecture_category,lecture_zipcode,lecture_roadAddress,lecture_jibunAddress,lecture_namujiAddress,lecture_maxcount)
+		VALUES (#{mentorId},#{memberId},#{lectureTitle},#{lectureContent},#{lecturePrice},#{lectureStart},#{lectureEnd},
+		#{lectureCategory},#{lectureZipcode},#{lectureRoadAddress},#{lectureJibunAddress},#{lectureNamujiAddress},#{lectureMaxcount}
+		);
+		<selectKey keyProperty="lectureId" resultType="int" order="AFTER">
+			SELECT IFNULL((SELECT MAX(lecture_id) from LECTURE),0) FROM DUAL <!-- oracle사용 경 SELECT NVL(MAX(id),0) FROM member -->
+		</selectKey> 
+	</insert>
+	
+	<select id="selectLectureId" parameterType="java.util.Map" resultType="int">
+		SELECT lecture_id FROM LECTURE WHERE mentor_id=#{mentorId} and member_id=#{memberId}
+	</select>
+	
+	<select id="selectLecture" parameterType="int" resultType="lectureDto">
+		SELECT * FROM LECTURE WHERE mentor_id=#{mentorId};
+	</select>
+	
+	<select id="searchLecture" parameterType="String" resultType="lectureDto">
+		SELECT * FROM LECTURE WHERE lecture_title LIKE CONCAT('%',#{lectureTitle},'%');
+	</select>
+	
+	<select id="lectureTitle" parameterType="String" resultType="String">
+		SELECT lecture_title FROM LECTURE WHERE lecture_title LIKE CONCAT('%',#{lectureTitle},'%');
+	</select>
+	
+	<select id="categoryLecture" parameterType="String" resultType="lectureDto">
+		SELECT * FROM LECTURE WHERE lecture_category LIKE CONCAT('%',#{lectureCategory},'%');
+	</select>
+	
+	<select id="selectLectureImgFile" parameterType="int" resultType="lectureImgDto">
+		SELECT * FROM LECTURE_IMGFILE WHERE lecture_id=#{lectureId};
+	</select>
+	
+	
+	<select id = "myOrderLecture" parameterType="int" resultType="lectureDto">
+		select * from lecture where lecture_id = any(select lecture_id from orders where member_id=#{memberId});
+	</select>
+	
+	<select id = "myOrderLectureImg" parameterType="int" resultType="lectureImgDto">
+		select * from lecture_imgfile where lecture_id=#{lecture_id} LIMIT 0,1;
+	</select>
+	
+	
+	<insert id="insertLectureImgFile" parameterType="java.util.List">
+	    INSERT INTO LECTURE_IMGFILE (lecture_id, lecture_img) VALUES
+    	<foreach collection="list" item="item" separator=" , " >
+			 ("${item.lectureId}", "${item.lectureImg}")
+		</foreach>
+	</insert>
+	
+	
+
+	<!--
+
+	<delete id="deleteUser" parameterType="userDto">
+		DELETE FROM USER WHERE user_email=#{userEmail};
+	</delete>
+	
+	
+<select id="selectByEmail" parameterType="String" resultType="userDto">
+		SELECT * FROM USER WHERE user_email=#{userEmail} 
+	</select>
+
+	<delete id="changePw" parameterType="userDto">
+		UPDATE USER SET user_password=#{userPassword} WHERE user_email=#{userEmail};
+	</delete>
+ 
+	<update id="member.update" parameterType="member">
+		UPDATE member SET name=#{name},password=#{password} WHERE email=#{email}
+	</update>
+
+	<delete id="member.delete" parameterType="member">
+		DELETE FROM MEMBER WHERE email=#{email} AND password= #{password}
+	</delete>
+
+	<select id="member.count" resultType="Integer">
+		SELECT COUNT(*) FROM member;
+	</select>
+	
+	<select id="member.selectByRegdate" parameterType="HashMap" resultType="member">
+		SELECT * FROM member WHERE regdate BETWEEN #{from} AND #{to} ORDER BY regdate DESC
+	</select>
+	
+	<select id="member.selectById" parameterType="Long" resultType="member">
+		SELECT * FROM member WHERE id=#{id}
+	</select>
+ -->
+ 
+</mapper>
+
+

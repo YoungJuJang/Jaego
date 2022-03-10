@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "=//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace = "lectureReviewDao">
+
+	<insert id = "inserts" parameterType="lectureReviewDto">
+		insert into LECTURE_REVIEW (lecture_id, member_id, review_writer, review_content, review_score)
+ 		values(#{lectureId}, #{memberId}, #{reviewWriter},#{reviewContent},#{reviewScore});
+	</insert>
+	
+	<select id="selects" parameterType="Integer" resultType="LectureReviewDto">
+		select * from lecture_review where review_id=#{reviewId}
+	</select>
+	
+	<select id="selectTitle" parameterType="Integer" resultType="String">
+		SELECT lecture_title FROM lecture where lecture_id=#{lectureId};
+	</select>
+	
+	<update id = "updates" parameterType="lectureReviewDto" >
+		update Lecture_REVIEW set review_writer=#{reviewWriter}, review_content = #{reviewContent},
+		review_score = #{reviewScore} where review_id = #{reviewId}
+	</update>
+	
+	<delete id = "deletes" parameterType="Integer">
+		delete from LECTURE_REVIEW where review_id = #{reviewId}
+	</delete>
+	
+<!--	<select id = "reviewList" resultType="lectureReviewDto">
+		select * FROM LECTURE_REVIEW ORDER BY REVIEW_ID
+	</select>
+	-->
+	
+	<select id="reviewTotalCount" resultType="int">
+		SELECT count(REVIEW_ID) FROM LECTURE_REVIEW	 where lecture_id=#{lectureId}		    
+	</select>
+	
+	 <select id="reviewList" resultType="lectureReviewDto">
+		select NN.*, 
+		(select distinct lecture_title from lecture, lecture_review
+			where lecture.lecture_id = lecture_review.lecture_id
+            and lecture_review.review_id = review_id) as title
+		from (select @ROWNUM:=@ROWNUM+1 as ROWNUM,  N.* from 
+		(select * from lecture_review where lecture_id=#{lectureId}) N, (SELECT @ROWNUM := 0)R ) NN
+	    where ROWNUM BETWEEN #{pageBegin} and #{pageEnd}
+		order by ROWNUM DESC;          
+	</select>
+	
+</mapper>
+

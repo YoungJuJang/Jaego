@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="lectureroomDao">
+	
+	<!-- 총 게시글 수 -->
+	<select id="lectureroomTotalCount" resultType="int">
+		SELECT count(lectureroom_id) as count FROM LECTUREROOM	where lecture_id=#{lectureId}			    
+	</select> 
+	
+	<!-- list -->
+	<select id="lectureroomList" resultType="LectureroomDto">
+<!-- 		 select * from (select @ROWNUM:=@ROWNUM+1 as ROWNUM,  N.* from 
+		(select * from LECTUREROOM order by LECTUREROOM_ID DESC) N, 
+		(SELECT @ROWNUM := 0)R ) NN where lecture_id=#{lectureId}	AND
+		ROWNUM BETWEEN #{pageBegin} and #{pageEnd}  -->
+		select ROWNUM, lectureroom_id, lecture_id, member_id, 
+				(SELECT distinct member_name FROM MEMBER, LECTUREROOM
+				WHERE LECTUREROOM.lecture_id = lecture_id AND MEMBER.member_id = NN.member_id) lectureroom_writer,
+				(SELECT distinct member_mentorstatus FROM MEMBER, LECTUREROOM
+				WHERE LECTUREROOM.lecture_id = lecture_id AND MEMBER.member_id = NN.member_id) mentor_status, 
+				lectureroom_title, lectureroom_content, lectureroom_regdate, lectureroom_fname, lectureroom_password 
+		from (select @ROWNUM:=@ROWNUM+1 as ROWNUM,  N.* from 
+			(select * from LECTUREROOM where lecture_id=#{lectureId}) N, 
+			(SELECT @ROWNUM := 0)R ) NN where 
+			ROWNUM BETWEEN #{pageBegin} and #{pageEnd} order by ROWNUM DESC;           
+	</select>
+	
+	<!-- select name -->
+	<select id="selectName" resultType="String" parameterType="Map">
+		SELECT distinct member_name FROM MEMBER, LECTUREROOM
+		WHERE LECTUREROOM.lecture_id = #{lectureId}
+		AND MEMBER.member_id = LECTUREROOM.member_id
+		AND LECTUREROOM.member_id = #{memberId};
+	</select>
+	
+	<!-- select memberId -->
+	<select id="selectMemberId" resultType="String" parameterType="LectureroomDto">
+		SELECT distinct member_id FROM LECTUREROOM
+		WHERE LECTUREROOM.lecture_id = #{lectureId}
+	</select>
+
+	
+	
+	<!-- read -->
+	<select id="select" parameterType="int" resultType="LectureroomDto">
+		SELECT member_name as lectureroom_writer, LECTUREROOM.*  FROM MEMBER, LECTUREROOM
+		WHERE lectureroom_id=#{lectureroomId} and MEMBER.member_id = LECTUREROOM.member_id;
+	
+	</select>
+
+	<!-- write -->		
+	<insert id="insert" parameterType="LectureroomDto">
+		INSERT INTO LECTUREROOM
+				(lectureroom_id, lecture_id, member_id, lectureroom_title,
+				lectureroom_content, lectureroom_fname, lectureroom_password)
+		VALUES (#{lectureroomId}, #{lectureId}, #{memberId}, #{lectureroomTitle},
+				#{lectureroomContent}, #{lectureroomFname}, #{lectureroomPassword})
+		<!-- <selectKey keyProperty="LectureroomId" resultType="Integer">
+		</selectKey>-->
+	</insert>
+	
+
+	
+	<!-- edit -->
+	<update id="update" parameterType="lectureroomDto">		
+		UPDATE LECTUREROOM SET lectureroom_title = #{lectureroomTitle},
+		lectureroom_content = #{lectureroomContent},
+		lectureroom_fname = #{lectureroomFname}
+		WHERE lectureroom_id = #{lectureroomId} AND lectureroom_password = #{lectureroomPassword}
+	</update>
+	
+	<delete id="delete" parameterType="int">
+		DELETE FROM LECTUREROOM WHERE lectureroom_id = #{lectureroomId}
+	</delete>
+	
+	<delete id="deleteALL">
+		DELETE FROM LECTUREROOM
+	</delete>
+	
+	
+
+	
+</mapper>

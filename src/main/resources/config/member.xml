@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Maooer 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="memberDao">
+
+	<!-- 회원 정보 등록(register) -->
+	<insert id="register" parameterType="memberDto">
+		INSERT INTO MEMBER (
+		 member_email1, member_email2, member_password, member_name,
+		member_phone1, member_phone2, member_phone3, member_gender, member_age)
+		VALUES (
+		 #{memberEmail1}, #{memberEmail2}, #{memberPassword}, #{memberName},
+		#{memberPhone1}, #{memberPhone2}, #{memberPhone3}, #{memberGender}, #{memberAge})
+	</insert>
+	
+	<!--이메일 중복 체크 쿼리 -->
+	<select id ="checkEmail" parameterType="HashMap" resultType="int">
+		SELECT COUNT(*) FROM MEMBER WHERE member_email1=#{memberEmail1} and member_email2=#{memberEmail2};
+	</select>
+	
+	<!-- 로그인 -->
+	<select id="login" parameterType="loginDto" resultType="memberDto">
+		SELECT * FROM MEMBER
+		WHERE CONCAT(MEMBER_EMAIL1,'@',MEMBER_EMAIL2) = #{memberEmail}
+		AND MEMBER_PASSWORD = #{memberPassword}
+	</select>
+	
+	<!-- 이메일 찾기 -->
+	<select id="findEmail" parameterType="findDto" resultType="findDto">
+		SELECT IFNULL(CONCAT(MEMBER_EMAIL1, '@', MEMBER_EMAIL2), 0)
+		as MEMBER_EMAIL FROM MEMBER
+		WHERE MEMBER_NAME = #{memberName}
+		AND CONCAT(MEMBER_PHONE1, MEMBER_PHONE2, MEMBER_PHONE3) = #{memberPhone}
+	</select>
+	
+	<!-- 비밀번호 찾기(새로운 비밀번호로 변경) -->
+	<update id="findPassword" parameterType="findDto">
+		UPDATE MEMBER
+		SET MEMBER_PASSWORD = #{newPassword}
+		WHERE MEMBER_ID in
+		(SELECT m_id from
+			(SELECT DISTINCT MEMBER_ID as m_id FROM MEMBER
+			WHERE MEMBER_NAME = #{memberName}
+			AND CONCAT(MEMBER_PHONE1, MEMBER_PHONE2, MEMBER_PHONE3) = #{memberPhone}
+			AND CONCAT(MEMBER_EMAIL1, '@', MEMBER_EMAIL2) = #{memberEmail}) tmp)
+	</update>
+	
+	<!-- 회원 정보 전체 조회 -->
+	<select id="selectByMemId" parameterType="Integer" resultType="memberDto">
+		SELECT * FROM MEMBER
+		WHERE member_id = #{memberId}
+	</select>
+	
+	
+	<!-- 회원 정보 수정-->
+	<!-- 비밀번호, 핸드폰 번호 123, 나이대  -->
+	<update id="update" parameterType="memberDto">
+		UPDATE MEMBER SET member_email1=#{memberEmail1}, member_email2=#{memberEmail2},
+			member_phone1 = #{memberPhone1}, member_phone2 = #{memberPhone2}, member_phone3 = #{memberPhone3},
+			member_password = #{memberPassword}, member_gender=#{memberGender}, member_age=#{memberAge}
+	</update>
+	
+	
+	
+	<!-- 4.회원 정보 수정(멘토 여부-멘토 승인됨) -->
+	<update id="updateMentorStatus" parameterType="Integer">
+		UPDATE MEMBER SET member_mentorstatus = 1
+		WHERE member_id = #{memberId}	
+	</update>			
+	
+	
+	<!-- 5.회원 정보 삭제 -->
+	<delete id="delete" parameterType="Integer">
+		DELETE FROM MEMBER WHERE member_id = #{memberId}
+	</delete>
+	
+</mapper>
